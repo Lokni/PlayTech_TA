@@ -7,11 +7,11 @@ import java.util.concurrent.locks.ReentrantLock;
 
 
 public class EvictionMap<K, V> {
-    private final Long expireTimeInMs;
+    private final long expireTimeInMs;
     private final Map<K, EvictableValueHolder<K, V>> storage;
     private final ReentrantLock lock;
 
-    public EvictionMap(Long expireTimeInMs) {
+    public EvictionMap(long expireTimeInMs) {
         this.expireTimeInMs = expireTimeInMs;
         this.storage = new ConcurrentHashMap<>();
         this.lock = new ReentrantLock();
