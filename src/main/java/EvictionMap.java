@@ -1,50 +1,50 @@
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 
 public class EvictionMap<K, V> {
-    private static final Long DELAY = 10_000L;
-    private final Map<Object, MyObjectHolder> storage = new ConcurrentHashMap<>();
+    private final Long expireTimeInMs;
+    private final Map<K, ObjectHolder> storage;
 
-
-    public int size() {
-        return storage.size();
-    }
-
-    public boolean isEmpty() {
-        return storage.isEmpty();
+    public EvictionMap(Long expireTimeInMs) {
+        this.storage = new ConcurrentHashMap<>();
+        this.expireTimeInMs = expireTimeInMs;
     }
 
     public void put(K key, V value) {
-        checkKeyNotNull(key);
-        MyObjectHolder data = new MyObjectHolder(value);
-        storage.put(key, data);
+        storage.put(key, new ObjectHolder(value, LocalDateTime.now().plus(expireTimeInMs, ChronoUnit.MILLIS)));
     }
 
     public V get(K key) {
-        MyObjectHolder value = storage.get(key);
-        if (System.currentTimeMillis() - value.expirationTime <= DELAY) {
-            storage.remove(key);
-            return null;
-        } else {
-            return value.value;
-        }
+        removeIfExpired(key);
+        return Optional.ofNullable(storage.get(key))
+                .map(ObjectHolder::getValue)
+                .orElse(null);
+    }
+
+    private void removeIfExpired(K key) {
+        Optional.ofNullable(storage.get(key)).ifPresent(objectHolder -> {
+            if (objectHolder.expirationTime.isBefore(LocalDateTime.now())) {
+                storage.remove(key);
+            }
+        });
     }
 
 
-    private void checkKeyNotNull(K key) {
-        if (key == null) {
-            throw new IllegalArgumentException();
-        }
-    }
-
-    private class MyObjectHolder {
+    private class ObjectHolder {
         private final V value;
-        private final Long expirationTime;
+        private final LocalDateTime expirationTime;
 
-        protected MyObjectHolder(V value) {
+        protected ObjectHolder(V value, LocalDateTime currentTime) {
             this.value = value;
-            expirationTime = System.currentTimeMillis();
+            this.expirationTime = currentTime;
+        }
+
+        public V getValue() {
+            return value;
         }
     }
 
