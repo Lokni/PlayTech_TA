@@ -71,10 +71,10 @@ public class EvictionMapUTest {
     }
 
     @Test
-    public void shouldInsert_10_000_values() {
+    public void shouldInsert_1000_values() {
         // Avoid eviction at least 10 minutes.
         testObj = new EvictionMap<>(Duration.ofMinutes(10).getSeconds() * 1000);
-        int valuesCount = 10_000;
+        int valuesCount = 1000;
 
         for (int i = 0; i < valuesCount; i++) {
             testObj.put("key_" + i, i);
@@ -86,8 +86,8 @@ public class EvictionMapUTest {
     }
 
     @Test
-    public void shouldInsertAndEvict_10_000_values() throws InterruptedException {
-        int valueCount = 10_000;
+    public void shouldInsertAndEvict_1000_values() throws InterruptedException {
+        int valueCount = 1000;
         int randomNumber = new Random().nextInt(valueCount);
         String randomKey = "key_" + randomNumber;
         Number actualRandomValue = null;
