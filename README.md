@@ -2,7 +2,7 @@ This algorithm stores data of the map type with the difference that the elements
 which can be set through the constructor.
 The ConcurrentHashMap was taken as a basis, since it is thread safe.
 
-EvictionMap stores a key and value. For value uses a helper class (EvictableValueHolder) that stores:
+EvictionMapSmart stores a key and value. For value uses a helper class (EvictableValueHolder) that stores:
 the key, value, object lifetime and timer.
 
 EvictableValueHolder class uses an interface (ExpirationHandler) to check the lifetime of an object and, if necessary, delete it.
