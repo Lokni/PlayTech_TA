@@ -1,4 +1,5 @@
 import java.util.Map;
+import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,6 +15,32 @@ public class EvictionMap<K, V> {
         this.expireTimeInMs = expireTimeInMs;
         this.storage = new ConcurrentHashMap<>();
         this.lock = new ReentrantLock();
+    }
+
+    public void put(K key, V value) {
+        storage.put(key, new EvictableValueHolder<>(key,
+                value,
+                expireTimeInMs,
+                (expiredKey, evictableValueHolder) -> {
+                    if (storage.containsValue(evictableValueHolder)) {
+                        try {
+                            lock.lock();
+                            storage.remove(expiredKey);
+                        } finally {
+                            lock.unlock();
+                        }
+                    }
+                }));
+    }
+
+    public V get(K key) {
+        return Optional.ofNullable(storage.get(key))
+                .map(EvictableValueHolder::getValue)
+                .orElse(null);
+    }
+
+    public int size() {
+        return storage.size();
     }
 
     private interface ExpirationHandler<K, V> {

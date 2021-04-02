@@ -11,7 +11,6 @@ public class Main {
         EvictionMap<String, Integer> test = new EvictionMap<>(10_000L);
 
 
-
         new Thread(() -> {
             try {
                 test.put("A", 1);
@@ -24,7 +23,6 @@ public class Main {
                 System.out.println(test.get("C"));
                 Thread.sleep(5000);
                 System.out.println(test.get("A"));
-
 
 
             } catch (InterruptedException e) {
