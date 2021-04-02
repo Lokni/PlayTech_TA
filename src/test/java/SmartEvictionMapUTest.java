@@ -5,13 +5,13 @@ import org.junit.jupiter.api.Test;
 import java.time.Duration;
 import java.util.Random;
 
-public class EvictionMapUTest {
+public class SmartEvictionMapUTest {
     private final static long EVICTION_DELAY_MS = 10_000L;
-    private EvictionMap<String, Number> testObj;
+    private EvictionMapSmart<String, Number> testObj;
 
     @BeforeEach
     public void setup() {
-        testObj = new EvictionMap<>(EVICTION_DELAY_MS);
+        testObj = new EvictionMapSmart<>(EVICTION_DELAY_MS);
     }
 
     @Test
@@ -73,7 +73,7 @@ public class EvictionMapUTest {
     @Test
     public void shouldInsert_1000_values() {
         // Avoid eviction at least 10 minutes.
-        testObj = new EvictionMap<>(Duration.ofMinutes(10).getSeconds() * 1000);
+        testObj = new EvictionMapSmart<>(Duration.ofMinutes(10).getSeconds() * 1000);
         int valuesCount = 1000;
 
         for (int i = 0; i < valuesCount; i++) {
